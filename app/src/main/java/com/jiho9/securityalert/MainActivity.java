@@ -29,15 +29,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        // 텍스트뷰 할당
         mTextView = findViewById(R.id.textViewTest);
+        // 네트워크 통신 객체 생성
         mClient = new OkHttpClient();
 
         connect();
     }
 
+    /**
+     * 웹 소켓 통신 기능
+     */
     private void connect() {
+        // json 파서 생성
         final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        // 웹 소켓 연결 설정
         Request request = new Request.Builder().url("ws://172.31.22.94:8765").build();
+        // 웹 소켓 연결
         WebSocket ws = mClient.newWebSocket(request, new WebSocketListener() {
 
             @Override
@@ -55,12 +63,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onMessage(WebSocket webSocket, final String text) {
                 super.onMessage(webSocket, text);
+                /*
+                메세지 수신 시
+                 */
                 Log.d(TAG, "onMessage: " + text);
+                // UI 스레드에서
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         String result = gson.fromJson(text, Map.class).toString();
                         Log.d(TAG, "run: " + result);
+                        // 수신한 텍스트 표시
                         mTextView.setText(result);
                     }
                 });
